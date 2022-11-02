@@ -2,31 +2,37 @@
 #include "DHT12.h"
 
 DHT12 DHT(&Wire);
+#define Pin_SLC D1
+#define pin_SDA D2
 
 void setup()
 {
   Serial.begin(9600);
-  DHT.begin(D2, D1);
+  DHT.begin(pin_SDA, Pin_SLC);
   int status = DHT.read();
   switch (status)
   {
   case DHT12_OK:
-    Serial.print("\nOK,\n");
+    Serial.println("OK");
     break;
   case DHT12_ERROR_CHECKSUM:
-    Serial.print("\nChecksum error,\n");
-    break;
+    Serial.println("Checksum error");
+    delay(10000);
+    ESP.restart();
   case DHT12_ERROR_CONNECT:
-    Serial.print("\nConnect error,\n");
-    break;
+    Serial.println("Connect error");
+    delay(10000);
+    ESP.restart();
   case DHT12_MISSING_BYTES:
-    Serial.print("\nMissing bytes,\n");
-    break;
+    Serial.println("Missing bytes");
+    delay(10000);
+    ESP.restart();
   default:
-    Serial.print("\nUnknown error,\n");
-    break;
+    Serial.println("Unknown error");
+    delay(10000);
+    ESP.restart();
   }
-  Serial.print("\nTemperature / Humidity\n");
+  Serial.println("Temperature / Humidity");
   delay(2000);
 }
 
@@ -35,9 +41,6 @@ void loop()
   if (millis() - DHT.lastRead() >= 2000)
   {
     DHT.read();
-    Serial.print("\nT : ");
-    Serial.print(DHT.getTemperature(), 1);
-    Serial.print("\tH : ");
-    Serial.print(DHT.getHumidity(), 1);
+    Serial.println("T : " + String(DHT.getTemperature()) + "\tH : " + String(DHT.getHumidity()));
   }
 }
